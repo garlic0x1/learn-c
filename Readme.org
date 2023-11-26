@@ -3,18 +3,20 @@
 * Chapter 1 - Intro
 ** Exercises
 *** 6
-Test EOF
-#+begin_src C
+Verify that the expression getchar() != EOF is 0 or 1.
+#+begin_src C :exports both
 #include <stdio.h>
 printf("%d\n", getchar() != EOF);
+printf("%d\n", getchar() == EOF);
 #+end_src
 
 #+RESULTS:
-: 1
+| 1 |
+| 1 |
 
 *** 7
-Print EOF
-#+begin_src C
+Write a program to print the value of EOF.
+#+begin_src C :exports both
 #include <stdio.h>
 printf("%c\n", EOF);
 #+end_src
