@@ -1,0 +1,351 @@
+#+title: The C Programming Language
+
+* Chapter 1
+** Exercises
+*** 6
+Test EOF
+#+begin_src C
+#include <stdio.h>
+printf("%d\n", getchar() != EOF);
+#+end_src
+
+#+RESULTS:
+: 1
+
+*** 7
+Print EOF
+#+begin_src C
+#include <stdio.h>
+printf("%c\n", EOF);
+#+end_src
+
+#+RESULTS:
+: ÿ
+
+*** 12
+Write a program that prints its input one word per line.
+#+begin_src C
+#include <stdio.h>
+#define SPC 0
+#define WORD 1
+
+int is_whitespace(int c) {
+    return c == '\n' || c == '\t' || c == ' ';
+}
+
+int is_newline(int c) {
+    return c == '\n';
+}
+
+void word_per_line() {
+    int state = SPC;
+
+    int c;
+    while ((c = getchar()) != EOF) {
+        if (is_whitespace(c) && state == WORD) {
+            printf("\n");
+            state = SPC;
+        }
+        else if (!is_whitespace(c)) {
+            printf("%c", c);
+            state = WORD;
+        }
+    }
+}
+#+end_src
+*** 14
+Write a program to print a histogram of the frequencies of different characters
+in its input.
+#+begin_src C
+#include <stdio.h>
+void digit_histogram() {
+    int digits[10];
+    for (int i = 0; i < 10; i++) digits[i] = 0;
+
+    int c;
+    while ((c = getchar()) != EOF) {
+        if (c >= '0' && c <= '9') digits[c - '0']++;
+    }
+
+    int max = 0;
+    for (int i = 0; i < 10; i++) {
+        int x = digits[i];
+        if (x > max) max = x;
+    }
+
+    for (int i = 0; i < 10; i++) {
+        printf("%d: ", i);
+        for (int j = 0; j < digits[i]; j++) {
+            printf("*");
+        }
+        printf("\n");
+    }
+}
+#+end_src
+*** 15
+Rewrite the temperature conversion program of Section 1.2 to use a function
+for conversion.
+#+begin_src C :exports both
+#include <stdio.h>
+
+int f_to_c(int temp) {
+    return 5 * (temp - 32) / 9;
+}
+
+printf("%d\n", f_to_c(-40));
+printf("%d\n", f_to_c(32));
+printf("%d\n", f_to_c(69));
+#+end_src
+
+#+RESULTS:
+| -40 |
+|   0 |
+|  20 |
+
+*** 16
+Revise the main routine of the longest-line program so it will correctly print
+the length of arbitrary long input lines, and as much as possible of the text.
+#+begin_src C
+int rest_line_len() {
+    int len = 0;
+    int c;
+    while ((c = getchar()) != EOF && c != '\n') len++;
+    return len;
+}
+
+int my_getline(char* into, int limit) {
+    int i = 0;
+    int c;
+    while ((c = getchar()) != EOF && c != '\n') {
+        if (i == limit - 2) break;
+        into[i] = c;
+        i++;
+    }
+    i += rest_line_len();
+    into[i] = '\0';
+    return i;
+}
+#+end_src
+*** 17
+Write a program to print all input lines that are longer than 80 characters.
+#+begin_src C
+// with the above my_getline()
+void print_lines(int longer_than) {
+    int len = 0;
+    char line[MAXLINE];
+
+    while ((len = my_getline(line, MAXLINE)) > 0) {
+        if (len > longer_than) {
+            printf("%s\n", line);
+        }
+    }
+}
+#+end_src
+*** 19
+Write a function "reverse(str)"" that reverses the character string str. Use it to
+write a program that reverses its input a line at a time.
+#+begin_src C
+void reverse(char* str) {
+    if (!str) return;
+
+    int i = 0;
+    int j = strlen(str) - 1;
+
+    while (i < j) {
+        char c = str[i];
+        str[i] = str[j];
+        str[j] = c;
+
+        i++;
+        j--;
+    }
+}
+
+void echo_rev() {
+    int len = 0;
+    char line[MAXLINE];
+
+    while ((len = my_getline(line, MAXLINE)) > 0) {
+        reverse(line);
+        printf("%s\n", line);
+    }
+}
+#+end_src
+*** 20
+Write a program detab that replaces tabs in the input with the proper number
+of blanks to space to the next tab stop. Assume a fixed set of tab stops, say every n columns.
+Should n be a variable or a symbolic parameter?
+#+begin_src C
+void detab(int spaces) {
+    int c;
+    while ((c = getchar()) != EOF) {
+        if (c == '\t') {
+            for (int i = 0; i < spaces; i++)
+                printf(" ");
+        } else {
+            printf("%c", c);
+        }
+    }
+}
+#+end_src
+** 5, Character I/O
+*** 1, File Copying
+A simple echo loop:
+#+begin_src C
+#include <stdio.h>
+
+void echo_loop() {
+    printf("Echo loop");
+    printf("C-d to send EOF and quit.");
+    while (1) {
+        int c = getchar();
+        if (c == EOF) {
+            break;
+        }
+        putchar(c);
+    }
+}
+#+end_src
+*** 4, Word Counting
+#+begin_src C
+#include <stdio.h>
+
+int is_whitespace(int c) {
+    return c == '\n' || c == '\t' || c == ' ';
+}
+
+int is_newline(int c) {
+    return c == '\n';
+}
+
+#define SPC 0
+#define WORD 1
+
+void wc() {
+    int state = SPC;
+
+    int chars = 0;
+    int words = 0;
+    int lines = 0;
+
+    int c;
+
+    while ((c = getchar()) != EOF) {
+        chars++;
+        if (is_newline(c)) lines++;
+        if (is_whitespace(c)) state = SPC;
+        else if (state == SPC) {
+            state = WORD;
+            words++;
+        }
+    }
+
+    printf("chars: %d\nwords: %d\nlines: %d\n", chars, words, lines);
+}
+#+end_src
+** 6, Arrays
+Count types of characters, with an array for digits:
+#+begin_src C
+#include <stdio.h>
+
+int is_whitespace(int c) {
+    return c == '\n' || c == '\t' || c == ' ';
+}
+
+int is_newline(int c) {
+    return c == '\n';
+}
+
+void count_categories() {
+    int other = 0;
+    int space = 0;
+    int digits[10];
+    for (int i = 0; i < 10; i++) {
+        digits[i] = 0;
+    }
+
+    int c;
+
+    while ((c = getchar()) != EOF) {
+        if (c >= '0' && c <= '9') digits[c - '0']++;
+        else if (is_whitespace(c)) space++;
+        else other++;
+    }
+
+    for (int i = 0; i < 10; i++) {
+        printf("%d: %d\n", i, digits[i]);
+    }
+
+    printf("Space: %d\nOther: %d\n", space, other);
+}
+#+end_src
+** 9, Character Arrays
+#+begin_src C
+#include <stdio.h>
+#define MAXLINE 1024
+
+int my_getline(char* into, int limit) {
+    int c, i;
+    for (i = 0; i < limit - 1; i++) {
+        c = getchar();
+        if (c == EOF || c == '\n') {
+            /* into[i] = '\n'; */
+            /* i++; */
+            break;
+        }
+        into[i] = c;
+    }
+    into[i] = '\0';
+    return i;
+}
+
+void copy(char* into, char* from) {
+    int i = 0;
+    while ((into[i] = from[i]) != '\0') i++;
+}
+
+void longest_line() {
+    int max_len = 0;
+    char max_line[MAXLINE];
+
+    int c_len = 0;
+    char c_line[MAXLINE];
+
+    while ((c_len = my_getline(c_line, MAXLINE)) > 0) {
+        if (c_len > max_len) {
+            max_len = c_len;
+            copy(max_line, c_line);
+        }
+    }
+
+    printf("%d\n", max_len);
+    printf("%s\n", max_line);
+}
+
+int main() {
+    longest_line();
+    return 0;
+}
+#+end_src
+
+** 10, External Variables and Scope
+#+begin_src C
+#include <stdio.h>
+int state;
+
+void print_state() {
+    extern int state;
+    printf("State: %d\n", state);
+}
+
+void inc_state() {
+    extern int state;
+    state += 1;
+}
+
+print_state();
+inc_state();
+print_state();
+inc_state();
+print_state();
+#+end_src
