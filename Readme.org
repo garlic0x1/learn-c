@@ -19,10 +19,12 @@ Write a program to print the value of EOF.
 #+begin_src C :exports both
 #include <stdio.h>
 printf("%c\n", EOF);
+printf("%d\n", EOF);
 #+end_src
 
 #+RESULTS:
-: ÿ
+|  ÿ |
+| -1 |
 
 *** 12
 Write a program that prints its input one word per line.
