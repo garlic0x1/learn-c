@@ -585,3 +585,184 @@ printf("%s\n", str);
 
 #+RESULTS:
 : heo
+
+* Chapter 3 - Control Flow
+** Exercises
+*** 2
+Write a function escape(s,t) that converts characters like newline and tab
+into visible escape sequences like \n and \t as it copies the string t to s. Use a switch. Write
+a function for the other direction as well, converting escape sequences into the real characters.
+#+begin_src C
+/* #include <stdlib.h> */
+#include <stdio.h>
+#include <string.h>
+
+void escape(char* str, char* into) {
+    int j = 0;
+    for (int i = 0; i < strlen(str); i++) {
+        switch (str[i]) {
+            case '\n':
+                into[j++] = '\\';
+                into[j++] = 'n';
+                break;
+            case '\t':
+                into[j++] = '\\';
+                into[j++] = 't';
+                break;
+            default:
+                into[j++] = str[i];
+                break;
+        }
+    }
+    into[j] = '\0';
+}
+
+// this one can work in-place since the string can only shrink
+void unescape(char* str) {
+    int esc = 0;
+    int j = 0;
+    for (int i = 0; i < strlen(str); i++) {
+        switch (str[i]) {
+            case '\\':
+                esc = 1;
+                break;
+            case 'n':
+                if (esc) str[j++] = '\n';
+                else str[j++] = str[i];
+                break;
+            case 't':
+                if (esc) str[j++] = '\t';
+                else str[j++] = str[i];
+                break;
+            default:
+                str[j++] = str[i];
+                break;
+        }
+    }
+    str[j] = '\0';
+}
+
+char raw[15] = "hello\tworld";
+char escaped[30];
+escape(raw, escaped);
+printf("raw: %s\nto: %s\n", raw, escaped);
+unescape(escaped);
+printf("unescaped: %s\n", escaped);
+
+#+end_src
+
+#+RESULTS:
+| raw:       | hello        | world |
+| to:        | hello\tworld |       |
+| unescaped: | hello        | world |
+
+*** 3
+Write a function expand(s1,s2) that expands shorthand notations like a-z in
+the string s1 into the equivalent complete list abc...xyz in s2. Allow for letters of either
+case and digits, and be prepared to handle cases like a-b-c and a-z0-9 and -a-z. Arrange
+that a leading or trailing - is taken literally.
+#+begin_src C
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char* expand_single(char* pattern) {
+    char start = pattern[0];
+    char end = pattern[2];
+    int size = (end - start) + 1;
+
+    char* result = malloc(size);
+
+    int i = 0;
+    while (start <= end) {
+        result[i++] = start++;
+    }
+
+    return result;
+}
+
+char* expanded = expand("1-y");
+printf("%s\n", expanded);
+free(expanded);
+
+#+end_src
+
+#+RESULTS:
+
+** 3, Else-if
+Binary search:
+#+begin_src C
+#include <stdio.h>
+
+int binsearch(int x, int* arr, int size) {
+    int low = 0;
+    int high = size - 1;
+    int mid;
+    while (low < high) {
+        mid = (low + high) / 2;
+        printf("low: %d\tmid: %d\thigh: %d\n", low, mid, high);
+        if (x == arr[mid]) {
+            return mid;
+        } else if (x > arr[mid]) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+}
+
+int arr[5] = {1, 2, 3, 4, 5};
+printf("%d\n", binsearch(5, arr, 5));
+#+end_src
+
+#+RESULTS:
+| low: 0	mid: 2	high: 4 |
+| low: 3	mid: 3	high: 4 |
+| 4                       |
+
+** 4, Switch
+#+begin_src C
+#include <stdio.h>
+
+void switcheroo(int x) {
+    switch (x) {
+        case 1: case 11:
+            printf("one");
+            break;
+        case 2: case 22:
+            printf("two");
+            break;
+        default:
+            printf("default");
+            break;
+    };
+}
+
+switcheroo(11);
+#+end_src
+
+#+RESULTS:
+: default
+
+* Scratch
+** Scoping with braces
+#+begin_src C
+#include <stdio.h>
+
+void f1(int x) {
+    printf("%d\n", x);
+    {
+        int y = x * x;
+        printf("%d\n", y);
+    }
+    // out of scope
+    /* printf("%d\n", y); */
+}
+
+f1(3);
+#+end_src
+
+#+RESULTS:
+| 3 |
+| 3 |
+| 9 |
