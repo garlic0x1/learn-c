@@ -592,7 +592,7 @@ printf("%s\n", str);
 Write a function escape(s,t) that converts characters like newline and tab
 into visible escape sequences like \n and \t as it copies the string t to s. Use a switch. Write
 a function for the other direction as well, converting escape sequences into the real characters.
-#+begin_src C
+#+begin_src C :exports both
 /* #include <stdlib.h> */
 #include <stdio.h>
 #include <string.h>
@@ -749,7 +749,7 @@ switcheroo(11);
 *** 1
 Write the function strindex(s,t) which returns the position of the rightmost
 occurrence of t in s, or -1 if there is none.
-#+begin_src C
+#+begin_src C :exports both
 #include <stdio.h>
 #include <string.h>
 
@@ -902,7 +902,7 @@ printf("a: %d\tb: %d\n", a, b);
 
 * Chapter 6 - Structures
 ** 8, Unions
-#+begin_src C
+#+begin_src C :exports both
 #include <stdio.h>
 
 union value {
