@@ -354,6 +354,8 @@ inc_state();
 print_state();
 #+end_src
 
+#+RESULTS:
+
 * Chapter 2 - Types, Operators and Expressions
 ** Exercises
 *** 1
@@ -691,7 +693,7 @@ free(expanded);
 
 ** 3, Else-if
 Binary search:
-#+begin_src C
+#+begin_src C :exports both
 #include <stdio.h>
 
 int binsearch(int x, int* arr, int size) {
@@ -721,28 +723,34 @@ printf("%d\n", binsearch(5, arr, 5));
 | 4                       |
 
 ** 4, Switch
-#+begin_src C
+#+begin_src C :exports both
 #include <stdio.h>
 
 void switcheroo(int x) {
     switch (x) {
         case 1: case 11:
-            printf("one");
+            printf("one\n");
             break;
         case 2: case 22:
-            printf("two");
+            printf("two\n");
             break;
         default:
-            printf("default");
+            printf("default\n");
             break;
     };
 }
 
 switcheroo(11);
+switcheroo(1);
+switcheroo(2);
+switcheroo(9);
 #+end_src
 
 #+RESULTS:
-: default
+| one     |
+| one     |
+| two     |
+| default |
 
 * Chapter 4 - Functions and Program Structure
 ** Exercises
@@ -879,6 +887,34 @@ test();
 | 1 |
 | 0 |
 * Chapter 5 - Pointers and Arrays
+** Exercises
+*** 3
+Write a pointer version of the function strcat that we showed in Chapter 2:
+strcat(s,t) copies the string t to the end of s.
+#+begin_src C
+#include <stdio.h>
+
+void my_strcat(char* s, char* t) {
+    int si = 0;
+    int ti = 0;
+    while (s[si] != '\0') si++;
+    while ((s[si++] = t[ti++]) != '\0');
+}
+
+char a[10] = "asdf";
+char b[10] = "1234";
+
+printf("%s\n", a);
+
+my_strcat(a, b);
+
+printf("%s\n", a);
+#+end_src
+
+#+RESULTS:
+| asdf     |
+| asdf1234 |
+
 ** 2, Pointers and Function Arguments
 swap:
 #+begin_src C :exports both
@@ -899,6 +935,52 @@ printf("a: %d\tb: %d\n", a, b);
 #+RESULTS:
 | a: 1 | b: 2 |
 | a: 2 | b: 1 |
+
+** 3, Pointers and Arrays
+#+begin_src C :exports both
+#include <stdio.h>
+
+int arr[4];
+printf("%x\n", arr);
+printf("%x\n", &arr[0]);
+printf("%x\n", &arr[1]);
+int* pa = &arr[2];
+printf("%x\n", pa);
+#+end_src
+
+#+RESULTS:
+| 8a3bd120 |
+| 8a3bd120 |
+| 8a3bd124 |
+| 8a3bd128 |
+
+** 5, Character Pointers and Functions
+strcpy:
+#+begin_src C :exports both
+#include <stdio.h>
+
+void my_strcpy(char* a, char* b) {
+    int i = 0;
+    while ((b[i] = a[i]) != '\0') i++;
+}
+
+char a[10] = "asdf";
+char b[10] = "burger";
+
+printf("%s\n", a);
+printf("%s\n", b);
+
+my_strcpy(a, b);
+
+printf("%s\n", a);
+printf("%s\n", b);
+#+end_src
+
+#+RESULTS:
+| asdf   |
+| burger |
+| asdf   |
+| asdf   |
 
 * Chapter 6 - Structures
 ** 8, Unions
