@@ -744,6 +744,183 @@ switcheroo(11);
 #+RESULTS:
 : default
 
+* Chapter 4 - Functions and Program Structure
+** Exercises
+*** 1
+Write the function strindex(s,t) which returns the position of the rightmost
+occurrence of t in s, or -1 if there is none.
+#+begin_src C
+#include <stdio.h>
+#include <string.h>
+
+int strindex_match(int i, char* str, char* pattern) {
+    for (int j = 0; pattern[j] != '\0'; j++)
+        if (pattern[j] != str[i++])
+            return 0;
+
+    return 1;
+}
+
+int strindex(char* str, char* pattern) {
+    for (int i = 0; str[i] != '\0'; i++)
+        if (strindex_match(i, str, pattern))
+            return i;
+
+    return -1;
+}
+
+printf("%d\n", strindex("abcdefg", "deg"));
+printf("%d\n", strindex("abcdefg", "def"));
+printf("%d\n", strindex("abcdefg", "a"));
+#+end_src
+
+#+RESULTS:
+| -1 |
+|  3 |
+|  0 |
+
+** 1, Basics of Functions
+simple grep:
+#+begin_src C
+void grep(char* selector, size_t line_size) {
+    char* buffer = malloc(line_size);
+    int n;
+    int count = 0;
+
+    while ((n = getline(&buffer, &line_size, stdin) != -1)) {
+        if (strstr(buffer, selector)) {
+            printf("%s\n", buffer);
+            count++;
+        }
+    }
+
+    printf("count: %d\n", count);
+}
+#+end_src
+** 10, Recursion
+quicksort:
+#+begin_src C
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
+void randomize(int* buf, size_t size) {
+    /* time_t current_time = time(NULL); */
+    /* srandom((unsigned int) current_time); */
+
+    for (int i = 0; i < size; i++) {
+        buf[i] = random();
+    }
+}
+
+void swap(int* v, int i, int j) {
+    int tmp = v[i];
+    v[i] = v[j];
+    v[j] = tmp;
+}
+
+void qsort(int* v, int left, int right) {
+    int i, last;
+
+    if (left >= right) {
+        return;
+    }
+
+    swap(v, left, (left + right) / 2);
+    last = left;
+
+    for (i = left + 1; i <= right; i++) /* partition */  {
+        if (v[i] < v[left]) {
+            swap(v, ++last, i);
+        }
+    }
+
+    swap(v, left, last);
+    qsort(v, left, last - 1);
+    qsort(v, last + 1, right);
+}
+
+void print_ints(int* buf, int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d", buf[i]);
+    }
+}
+
+int buf[24];
+print_ints(buf, 24);
+
+    my_qsort(buf, 0, 25);
+    print_ints(buf, 24);
+#+end_src
+
+#+RESULTS:
+
+** 11, The C Preprocessor
+basic loop macro and constant parameter:
+#+begin_src C :exports both
+#include <stdio.h>
+#define NUM 3
+#define loop while (1)
+
+void test() {
+    int i = NUM;
+    loop {
+        printf("%d\n", i);
+        if (i == 0) break;
+        else i--;
+    }
+}
+test();
+#+end_src
+
+#+RESULTS:
+| 3 |
+| 2 |
+| 1 |
+| 0 |
+* Chapter 5 - Pointers and Arrays
+** 2, Pointers and Function Arguments
+swap:
+#+begin_src C :exports both
+#include <stdio.h>
+void swap(int* a, int* b) {
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+int a = 1;
+int b = 2;
+printf("a: %d\tb: %d\n", a, b);
+swap(&a, &b);
+printf("a: %d\tb: %d\n", a, b);
+#+end_src
+
+#+RESULTS:
+| a: 1 | b: 2 |
+| a: 2 | b: 1 |
+
+* Chapter 6 - Structures
+** 8, Unions
+#+begin_src C
+#include <stdio.h>
+
+union value {
+    int ival;
+    float fval;
+};
+union value v;
+
+v.fval = 1.3;
+printf("%5.5f\n", v.fval);
+v.ival = 1;
+printf("%d\n", v.ival);
+#+end_src
+
+#+RESULTS:
+| 1.3 |
+|   1 |
+
 * Scratch
 ** Scoping with braces
 #+begin_src C
