@@ -1090,6 +1090,84 @@ print_keycount(tab[2]);
 | key: world  | count: 0         |
 | key: (null) | count: 792467120 |
 
+** 4, Pointers to Structures
+Count instances of words in a file:
+#+begin_src C
+#include <stdio.h>
+#include <ctype.h>
+
+#define MAXWORD 64
+
+struct Count {
+    char* key;
+    int count;
+};
+typedef struct Count Count;
+
+Count make_count(char* key, int count) {
+    Count c;
+    c.key = key;
+    c.count = count;
+    return c;
+}
+
+void print_count(Count c) {
+    printf("key: %s\tcount: %d\n", c.key, c.count);
+}
+
+int string_equals(char* a, char* b) {
+    char aa, bb;
+    for (int i = 0;; i++) {
+        if (a[i] != b[i]) return 0;
+        if (a[i] == '\0') return 1;
+    }
+}
+
+int getword(char* buf, size_t size) {
+    int c = getchar();
+    int i = 0;
+
+    // tell parent loop to stop reading at EOF
+    if (EOF == c) return EOF;
+    // trim prepending space
+    if (isspace(c)) return getword(buf, size);
+
+    // try and get a word
+    do buf[i++] = c;
+    while ((c = getchar()) != EOF && !isspace(c) && i < size);
+
+    // end string and return length
+    buf[i] = '\0';
+    return i;
+}
+
+void inc_count(char* key, Count* tab, size_t size) {
+    for (int i = 0; i < size; i++) {
+        if (string_equals(tab[i].key, key)) {
+            tab[i].count++;
+            return;
+        }
+    }
+}
+
+int main() {
+    Count tab[] = {
+        {"void", 0},
+        {"int", 0},
+    };
+
+    char buf[MAXWORD];
+    int in;
+    while ((in = getword(buf, MAXWORD)) != EOF) {
+        inc_count(buf, tab, 2);
+    }
+
+    for (int i = 0; i < 2; i++) {
+        print_count(tab[i]);
+    }
+    return 0;
+}
+#+end_src
 ** 8, Unions
 #+begin_src C :exports both
 #include <stdio.h>
@@ -1112,8 +1190,10 @@ printf("%d\n", v.ival);
 
 * Scratch
 ** Scoping with braces
-#+begin_src C
+#+begin_src C :exports both
 #include <stdio.h>
+
+printf("%d\n", EOF);
 
 void f1(int x) {
     printf("%d\n", x);
@@ -1129,7 +1209,6 @@ f1(3);
 #+end_src
 
 #+RESULTS:
-| 3 |
-| 3 |
-| 9 |
-
+| -1 |
+|  3 |
+|  9 |
