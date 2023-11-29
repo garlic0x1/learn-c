@@ -983,6 +983,113 @@ printf("%s\n", b);
 | asdf   |
 
 * Chapter 6 - Structures
+** 1, Basics of Structures
+#+begin_src C :exports both
+#include <stdio.h>
+
+struct point {
+    int x;
+    int y;
+};
+typedef struct point point;
+
+point make_point(int x, int y) {
+    point p;
+    p.x = x;
+    p.y = y;
+    return p;
+}
+
+void print_point(point p) {
+    printf("x: %d\ty: %d\n", p.x, p.y);
+}
+
+point p1 = make_point(1, 3);
+
+print_point(p1);
+#+end_src
+
+#+RESULTS:
+| x: 1 | y: 3 |
+
+** 2, Structures and Functions
+structs can be passed by value like in add_point:
+#+begin_src C :exports both
+#include <stdio.h>
+
+struct point {
+    int x;
+    int y;
+};
+typedef struct point point;
+
+point make_point(int x, int y) {
+    point p;
+    p.x = x;
+    p.y = y;
+    return p;
+}
+
+void print_point(point p) {
+    printf("x: %d\ty: %d\n", p.x, p.y);
+}
+
+point add_point(point a, point b) {
+    a.x += b.x;
+    a.y += b.y;
+    return a;
+}
+
+point p1 = make_point(1, 3);
+point p2 = make_point(6, 9);
+point p3 = add_point(p1, p2);
+
+print_point(p1);
+print_point(p2);
+print_point(p3);
+#+end_src
+
+#+RESULTS:
+| x: 1 | y: 3  |
+| x: 6 | y: 9  |
+| x: 7 | y: 12 |
+
+** 3, Arrays of Structures
+#+begin_src C :exports both
+#include <stdio.h>
+
+struct keycount {
+    char* key;
+    int count;
+};
+typedef struct keycount keycount;
+
+keycount make_keycount(char* key, int count) {
+    keycount kc;
+    kc.key = key;
+    kc.count = count;
+    return kc;
+}
+
+void print_keycount(keycount kc) {
+    printf("key: %s\tcount: %d\n", kc.key, kc.count);
+}
+
+keycount tab[] = {
+    {"hi", 0},
+    {"world", 0}
+};
+
+print_keycount(tab[0]);
+print_keycount(tab[1]);
+print_keycount(tab[2]);
+#+end_src
+
+#+RESULTS:
+| key: hi     | count: 0         |
+| key: world  | count: 0         |
+| key: (null) | count: 792467120 |
+
 ** 8, Unions
 #+begin_src C :exports both
 #include <stdio.h>
@@ -1025,3 +1132,4 @@ f1(3);
 | 3 |
 | 3 |
 | 9 |
+
