@@ -1168,6 +1168,58 @@ int main() {
     return 0;
 }
 #+end_src
+** 6, Table Lookup
+Naive matching string keyword in "alist":
+#+begin_src C :exports both
+#include <stdio.h>
+
+struct Count {
+    char* key;
+    int count;
+};
+typedef struct Count Count;
+
+Count make_count(char* key, int count) {
+    Count c;
+    c.key = key;
+    c.count = count;
+    return c;
+}
+
+void print_count(Count c) {
+    printf("key: %s\tcount: %d\n", c.key, c.count);
+}
+
+int string_equals(char* a, char* b) {
+    char aa, bb;
+    for (int i = 0;; i++) {
+        if (a[i] != b[i]) return 0;
+        if (a[i] == '\0') return 1;
+    }
+}
+
+Count tab_get(char* key, Count* tab, size_t size) {
+    for (int i = 0; i < size; i++) {
+        if (string_equals(tab[i].key, key)) {
+            return tab[i];
+        }
+    }
+}
+
+Count tab[] = {
+    {"void", 0},
+    {"int", 2},
+    {"bruh", 3}
+};
+
+print_count(tab_get("void", tab, 3));
+print_count(tab_get("bruh", tab, 3));
+#+end_src
+
+#+RESULTS:
+| key: void | count: 0 |
+| key: bruh | count: 3 |
+
 ** 8, Unions
 #+begin_src C :exports both
 #include <stdio.h>
@@ -1180,13 +1232,66 @@ union value v;
 
 v.fval = 1.3;
 printf("%5.5f\n", v.fval);
+printf("%d\n", v.ival);
 v.ival = 1;
 printf("%d\n", v.ival);
 #+end_src
 
 #+RESULTS:
-| 1.3 |
-|   1 |
+|        1.3 |
+| 1067869798 |
+|          1 |
+
+#+begin_src C :exports both
+#include <stdio.h>
+
+enum {INT = 1, FLOAT = 2};
+
+struct Value {
+    int utype;
+    union {
+        float fval;
+        int   ival;
+    } u;
+};
+typedef struct Value Value;
+
+Value make_fval(float val) {
+    Value v;
+    v.utype = FLOAT;
+    v.u.fval = val;
+    return v;
+}
+
+Value make_ival(int val) {
+    Value v;
+    v.utype = INT;
+    v.u.ival = val;
+    return v;
+}
+
+void print_value(Value v) {
+    switch (v.utype) {
+        case INT:
+            printf("INT: %d\n", v.u.ival);
+            break;
+        case FLOAT:
+            printf("FLOAT: %f\n", v.u.fval);
+            break;
+    }
+}
+
+Value v = make_ival(3);
+print_value(v);
+Value v2 = make_fval(3.1);
+print_value(v2);
+print_value(v);
+#+end_src
+
+#+RESULTS:
+| INT:   |   3 |
+| FLOAT: | 3.1 |
+| INT:   |   3 |
 
 * Scratch
 ** Scoping with braces
