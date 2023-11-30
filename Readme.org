@@ -1293,6 +1293,133 @@ print_value(v);
 | FLOAT: | 3.1 |
 | INT:   |   3 |
 
+* Chapter 7 - Input and Output
+** Exercises
+*** 1
+Write a program that converts upper case to lower or lower case to upper,
+depending on the name it is invoked with, as found in argv[0].
+#+begin_src C
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+int main(int argc, char** argv) {
+    char* case_opt = argv[1];
+    int (*f)(int);
+
+    if (strcmp(case_opt, "lower") == 0)
+        f = tolower;
+    else
+        f = toupper;
+
+    int c;
+    while ((c = getchar()) != EOF)
+        putchar(f(c));
+
+    return 0;
+}
+#+end_src
+*** 3
+Revise minprintf to handle more of the other facilities of printf.
+#+begin_src C :exports both
+#include <stdio.h>
+#include <stdarg.h>
+
+int my_printf(char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+
+    for (char* p = fmt; *p; p++) {
+        if ('%' == *p) {
+            switch (*++p) {
+            case 'd':
+                printf("%d", va_arg(ap, int));
+                break;
+            case 'f':
+                printf("%f", va_arg(ap, double));
+                break;
+            case 's':
+                printf("%s", va_arg(ap, char*));
+                break;
+            case 'x':
+                printf("%x", va_arg(ap, int));
+                break;
+            default:
+                putchar(*p);
+                break;
+            }
+        } else {
+            putchar(*p);
+        }
+    }
+    va_end(ap);
+}
+
+my_printf("hi%d\n", 3);
+my_printf("hi%d\n", 3.1);
+my_printf("hi%f\n", 3.1);
+my_printf("hi%s\n", "world");
+#+end_src
+
+#+RESULTS:
+| hi3          |
+| hi2104444352 |
+| hi3.100000   |
+| hiworld      |
+
+** 1, Standard Input and Output
+#+begin_src C :exports both
+#include <stdio.h>
+#include <ctype.h>
+int res = putchar('1');
+putchar(toupper(res));
+#+end_src
+
+#+RESULTS:
+: 11
+** 2, Formatted Output - printf
+#+begin_src C :exports both
+#include <stdio.h>
+
+char* s = "asdf";
+
+printf("d:%2d.\n", 17);
+printf("p:%p.\n", 17);
+printf("x:%x.\n", 17);
+printf("s:%s.\n", s);
+printf("p:%s.\n", s);
+#+end_src
+
+#+RESULTS:
+| d:17.   |
+| p:0x11. |
+| x:11.   |
+| s:asdf. |
+| p:asdf. |
+
+** 3, Variable-length Argument Lists
+va_list and va_start set up the variadic list,
+va_arg gets the next arg:
+#+begin_src C :exports both
+#include <stdio.h>
+#include <stdarg.h>
+
+int my_printf(char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+
+    printf("%s\n", va_arg(ap, char*));
+    printf("%s\n", va_arg(ap, char*));
+}
+
+my_printf("hi", "world");
+#+end_src
+
+#+RESULTS:
+| world   |
+| êX¿Ëü |
+
+
 * Scratch
 ** Scoping with braces
 #+begin_src C :exports both
@@ -1317,3 +1444,17 @@ f1(3);
 | -1 |
 |  3 |
 |  9 |
+
+** Boolean test
+#+begin_src C :exports both
+#include <stdio.h>
+
+printf("%d\n", (1 == 1 == 1 != 0));
+if (-1) {
+    printf("yes");
+}
+#+end_src
+
+#+RESULTS:
+|   1 |
+| yes |
