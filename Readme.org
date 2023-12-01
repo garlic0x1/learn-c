@@ -1367,6 +1367,81 @@ my_printf("hi%s\n", "world");
 | hi3.100000   |
 | hiworld      |
 
+*** 6
+Write a program to compare two files, printing the first line where they differ.
+#+begin_src C
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#define MAXLINE (size_t) 1024
+
+void diff_lines(FILE* file_a, FILE* file_b) {
+    size_t s = MAXLINE;
+    char* line_a[s];
+    char* line_b[s];
+    int nread_a;
+    int nread_b;
+
+    while (1) {
+        nread_a = getline(line_a, &s, file_a);
+        nread_b = getline(line_b, &s, file_b);
+
+        if (strcmp(*line_a, *line_b) != 0) {
+            printf("a: %s\nb: %s\n", *line_a, *line_b);
+            return;
+        }
+    }
+}
+
+int main(int argc, char** argv) {
+
+    if (argc != 3)
+        return -1;
+
+    FILE* a = fopen(argv[1], "r");
+    FILE* b = fopen(argv[2], "r");
+
+    diff_lines(a, b);
+
+    fclose(a);
+    fclose(b);
+    return 0;
+}
+#+end_src
+
+*** 8
+Write a program to print a set of files, starting each new one on a new page,
+with a title and a running page count for each file.
+#+begin_src C
+#include <stdlib.h>
+#include <stdio.h>
+
+void redirect(FILE* in, FILE* out) {
+    int c;
+    while ((c = getc(in)) != EOF)
+        putc(c, out);
+}
+
+int main(int argc, char** argv) {
+    FILE *stream;
+    int page_num = 0;
+
+    if (argc == 1)
+        return -1;
+
+    for (int i = 1; i < argc; i++) {
+        printf("\nPage %d: %s\n", ++page_num, argv[i]);
+        if ((stream = fopen(argv[i], "r")) == NULL)
+            return -1;
+        redirect(stream, stdout);
+        fclose(stream);
+    }
+
+    printf("\nTotal Pages: %d\n", page_num);
+    return 0;
+}
+#+end_src
 ** 1, Standard Input and Output
 #+begin_src C :exports both
 #include <stdio.h>
@@ -1419,6 +1494,33 @@ my_printf("hi", "world");
 | world   |
 | êX¿Ëü |
 
+** 5, File Access
+cat implementation:
+#+begin_src C
+#include <stdlib.h>
+#include <stdio.h>
+
+void redirect(FILE* in, FILE* out) {
+    int c;
+    while ((c = getc(in)) != EOF)
+        putc(c, out);
+}
+
+int main(int argc, char** argv) {
+    FILE *stream;
+
+    if (argc == 1)
+        return -1;
+
+    for (int i = 1; i < argc; i++) {
+        if ((stream = fopen(argv[i], "r")) == NULL)
+            return -1;
+        redirect(stream, stdout);
+        fclose(stream);
+    }
+    return 0;
+}
+#+end_src
 
 * Scratch
 ** Scoping with braces
